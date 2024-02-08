@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Button } from 'react-native';
+import { View, StyleSheet, Dimensions, Button, Text } from 'react-native';
 import { Video } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import * as ImagePicker from 'expo-image-picker';
@@ -10,14 +10,30 @@ export default function VideoPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [videoSource, setVideoSource] = useState(null);
+  const [buttonText, setButtonText] = useState('Play');
+  const [frameRate, setFrameRate] = useState(0);
+
   const videoPlayer = useRef(null);
+  const playButton = useRef(null);
+
+  const formatTime = (timeInMillis) => {
+    let totalSeconds = timeInMillis / 1000;
+    let hours = Math.floor(totalSeconds / 3600);
+    let minutes = Math.floor((totalSeconds - hours * 3600) / 60);
+    let seconds = totalSeconds - (hours * 3600 + minutes * 60);
+    let milliseconds = (seconds - Math.floor(seconds)) * 1000;
+
+    return `${hours.toFixed(0)}:${minutes.toFixed(0)}:${seconds.toFixed(0)}:${milliseconds.toFixed(0)}`;
+  };
 
   const onLoad = (status) => {
     setDuration(status.durationMillis);
   };
 
   const onProgress = (status) => {
-    setCurrentTime(status.positionMillis);
+    if (status.isPlaying) {
+      setCurrentTime(status.positionMillis);
+    }
   };
 
   const onSlide = (milliseconds) => {
@@ -32,9 +48,27 @@ export default function VideoPlayer() {
     });
 
     if (!result.cancelled) {
+      // GET FRAME RATE
+      
       setVideoSource(result.assets.at(0).uri);
     }
   };
+
+  const playOrStop = () => {
+    if (videoSource) {
+      if (videoPlayer.current != null) {
+        if (buttonText === 'Pause') {
+          videoPlayer.current.pauseAsync().then(() => {
+            setButtonText('Play');
+          });
+        } else {
+          videoPlayer.current.playAsync().then(() => {
+            setButtonText('Pause');
+          });
+        }
+      }
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -51,12 +85,16 @@ export default function VideoPlayer() {
           }}
         />
       )}
+      <Text>{formatTime(currentTime)}</Text>
       <Slider
         style={styles.slider}
         maximumValue={duration}
         value={currentTime}
         onSlidingComplete={onSlide}
       />
+      <View>
+        <Button ref={playButton} title="Play" onPress={() => playOrStop()} />
+      </View>
     </View>
   );
 }

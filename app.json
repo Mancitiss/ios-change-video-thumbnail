@@ -18,16 +18,23 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app uses photos and videos from the library."
-      }
+      },
+      "bundleIdentifier": "mancitiss.changevideothumbnail"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "mancitiss.changevideothumbnail"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7d002b60-1dfd-45b2-9f64-c0e1c073e57b"
+      }
     }
   }
 }
